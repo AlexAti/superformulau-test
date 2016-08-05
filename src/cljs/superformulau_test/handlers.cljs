@@ -6,3 +6,8 @@
  :initialize-db
  (fn  [_ _]
    db/default-db))
+
+(re-frame/register-handler
+ :set-sfu-key
+ (fn [app [_ k v]]
+   (assoc-in app [:sfu-values k] v)))
