@@ -98,10 +98,9 @@
      :component-did-update #(let [[_ values] (reagent/argv %)] (sfu-paint values position))}))
 
 (defn main-panel []
-  (let [name (re-frame/subscribe [:name])
-        sfu-values (re-frame/subscribe [:sfu-values])]
+  (let [sfu-values (re-frame/subscribe [:sfu-values])]
     (fn []
       [:div
-        [:div "Hello from " @name]
+        [:h3 "Superformula-U Test"]
         [slider-panel]
         [sfu-comp @sfu-values [100 100]]])))
