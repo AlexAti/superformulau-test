@@ -10,7 +10,7 @@
    [:input {:type "range"
             :name name
             :on-change #(re-frame/dispatch [:set-sfu-key
-                                            (symbol (str ":" name))
+                                            (keyword name)
                                             (-> % .-target .-value)])
             :min min
             :value val
@@ -65,27 +65,31 @@
 
 (defn sfu-paint [values position]
   (let [valuevec (map values [:a :b :y :z :n1 :n2 :n3]) ; to ensure proper param order
-        d3values (clj->js [(sfu-figure 30 position 128 valuevec)])]
+        d3values (clj->js [(sfu-figure 30 position 128 [1 1 2 10 -1.5 1 1])])]
+                                                       ;valuevec)])]
     ; Enter method
     (.. js/d3
         (select "svg.sfu")
-        (selectAll "path")
+        (selectAll "g.sfu")
         (data d3values)
         enter
+        (append "svg:g.sfu") ; The g makes the path not visible (sizing problem?)
+        (attr "transform" "translate(50, 50)")
         (append "svg:path")
         (attr "d" (.radialLine js/d3)))
 
     ; Update method
     (.. js/d3
         (select "svg.sfu")
-        (selectAll "path")
+        (selectAll "g.sfu")
         (data d3values)
+        (select "svg:path")
         (attr "d" (.radialLine js/d3)))
 
     ; Exit method
     (.. js/d3
         (select "svg.sfu")
-        (selectAll "path")
+        (selectAll "g.sfu")
         (data d3values)
         exit
         (remove))))
@@ -102,5 +106,5 @@
     (fn []
       [:div
         [:h3 "Superformula-U Test"]
-        [slider-panel]
-        [sfu-comp @sfu-values [100 100]]])))
+        [sfu-comp @sfu-values [100 100]]
+        [slider-panel]])))
