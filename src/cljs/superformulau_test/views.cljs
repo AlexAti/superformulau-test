@@ -24,7 +24,7 @@
              (for [k (keys @sfu-values)]
                [slider
                 (subs (str k) 1)
-                [-100 100]
+                [-10 10]
                 (k @sfu-values)]))])))
 
 (defn superformulau-radium [angle [a b y z n1 n2 n3]]
@@ -63,18 +63,17 @@
     ;; (see https://github.com/d3/d3-shape#lines)
      polarcoords)))
 
-(defn sfu-paint [values position]
+(defn sfu-paint [values [x y]]
   (let [valuevec (map values [:a :b :y :z :n1 :n2 :n3]) ; to ensure proper param order
-        d3values (clj->js [(sfu-figure 30 position 128 [1 1 2 10 -1.5 1 1])])]
-                                                       ;valuevec)])]
+        d3values (clj->js [(sfu-figure 30 [x y] 128 valuevec)])]
     ; Enter method
     (.. js/d3
         (select "svg.sfu")
         (selectAll "g.sfu")
         (data d3values)
         enter
-        (append "svg:g.sfu") ; The g makes the path not visible (sizing problem?)
-        (attr "transform" "translate(50, 50)")
+        (append "svg:g")
+        (attr "transform" (str "translate(" x "," y ")"))
         (append "svg:path")
         (attr "d" (.radialLine js/d3)))
 
@@ -99,7 +98,7 @@
     {:display-name "SuperformulaU component"
      :reagent-render (fn [] [:svg.sfu])
      :component-did-mount #(sfu-paint values position)
-     :component-did-update #(let [[_ values] (reagent/argv %)] (sfu-paint values position))}))
+     :component-did-update #(let [[_ vals] (reagent/argv %)] (sfu-paint vals position))}))
 
 (defn main-panel []
   (let [sfu-values (re-frame/subscribe [:sfu-values])]
