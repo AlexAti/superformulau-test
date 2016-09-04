@@ -69,7 +69,7 @@
     ; Enter method
     (.. js/d3
         (select "svg.sfu")
-        (selectAll "g.sfu")
+        (selectAll "g")
         (data d3values)
         enter
         (append "svg:g")
@@ -80,15 +80,15 @@
     ; Update method
     (.. js/d3
         (select "svg.sfu")
-        (selectAll "g.sfu")
+        (selectAll "g")
         (data d3values)
-        (select "svg:path")
+        (select "path")
         (attr "d" (.radialLine js/d3)))
 
     ; Exit method
     (.. js/d3
         (select "svg.sfu")
-        (selectAll "g.sfu")
+        (selectAll "g")
         (data d3values)
         exit
         (remove))))
