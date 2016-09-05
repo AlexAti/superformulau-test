@@ -14,6 +14,7 @@
                                             (-> % .-target .-value)])
             :min min
             :value val
+            :step (/ (- max min) 1000)
             :max max}]])
 
 (defn slider-panel []
