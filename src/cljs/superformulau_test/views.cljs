@@ -54,8 +54,10 @@
   ([size [x y] resolution params]
    (let [pi2 (* 2 Math.PI)
          steps (range 0 pi2 (/ pi2 resolution))
-         radiums (map #(* size (superformulau-radium % params)) steps)
-         polarcoords (partition 2 (interleave steps radiums))]
+         radiums (map #(superformulau-radium % params) steps)
+         mean-radium (/ (apply + radiums) (count radiums))
+         scaled-radiums (map #(* % (/ size mean-radium)) radiums)
+         polarcoords (partition 2 (interleave steps scaled-radiums))]
     ;      coords (map polar-to-cartesian polarcoords)]
     ;  (map (fn [[i j]] [(+ x i)
     ;                    (+ y j)])
