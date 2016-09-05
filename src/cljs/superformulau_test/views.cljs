@@ -3,13 +3,14 @@
               [reagent.core :as reagent]
               [cljsjs.d3]))
 
-(defn slider [name [min max] val]
+(defn slider [name creature [min max] val]
   [:div
    [:label {:for name}
     (str "Value for " name " is (" val "):")]
    [:input {:type "range"
             :name name
             :on-change #(re-frame/dispatch [:set-sfu-key
+                                            creature
                                             (keyword name)
                                             (-> % .-target .-value)])
             :min min
@@ -18,15 +19,18 @@
             :max max}]])
 
 (defn slider-panel []
-  (let [sfu-values (re-frame/subscribe [:sfu-values])]
+  (let [creatures (re-frame/subscribe [:creature-list])
+        selected-creature (re-frame/subscribe [:creature-change])]
     (fn []
       [:div.slider-panel
+       [:p (str "You have selected creature #" @selected-creature)]
        (into [:form]
-             (for [k (keys @sfu-values)]
+             (for [k (keys (first @creatures))]
                [slider
                 (subs (str k) 1)
+                @selected-creature
                 [-10 10]
-                (k @sfu-values)]))])))
+                (k (nth @creatures @selected-creature))]))])))
 
 (defn superformulau-radium [angle [a b y z n1 n2 n3]]
   (Math.pow
@@ -66,47 +70,56 @@
     ;; (see https://github.com/d3/d3-shape#lines)
      polarcoords)))
 
-(defn sfu-paint [values [x y]]
-  (let [valuevec (map values [:a :b :y :z :n1 :n2 :n3]) ; to ensure proper param order
+(defn sfu-paint [values [x y] index]
+  (let [hue (:hue values)
+        valuevec (map values [:a :b :y :z :n1 :n2 :n3]) ; to ensure proper param order
         d3values (clj->js [(sfu-figure 30 [x y] 128 valuevec)])]
     ; Enter method
     (.. js/d3
-        (select "svg.sfu")
+        (selectAll "svg.sfu")
+        (filter (fn [d i] (= i index)))
         (selectAll "g")
         (data d3values)
         enter
         (append "svg:g")
         (attr "transform" (str "translate(" x "," y ")"))
         (append "svg:path")
-        (attr "d" (.radialLine js/d3)))
+        (attr "d" (.radialLine js/d3))
+        (style "stroke" (str "hsla(" hue ", 100%, 50%, 0.5)"))
+        (style "fill" (str "hsla(" (mod (+ hue 40) 360) ", 100%, 50%, 1.0)")))
 
     ; Update method
     (.. js/d3
-        (select "svg.sfu")
+        (selectAll "svg.sfu")
+        (filter (fn [d i] (= i index)))
         (selectAll "g")
         (data d3values)
         (select "path")
-        (attr "d" (.radialLine js/d3)))
+        (attr "d" (.radialLine js/d3))
+        (style "stroke" (str "hsla(" hue ", 100%, 50%, 0.5)"))
+        (style "fill" (str "hsla(" (mod (+ hue 40) 360) ", 100%, 50%, 1.0)")))
 
     ; Exit method
     (.. js/d3
-        (select "svg.sfu")
+        (selectAll "svg.sfu")
+        (filter (fn [d i] (= i index)))
         (selectAll "g")
         (data d3values)
         exit
         (remove))))
 
-(defn sfu-comp [values position]
+(defn sfu-comp [values position index]
   (reagent/create-class
     {:display-name "SuperformulaU component"
      :reagent-render (fn [] [:svg.sfu])
-     :component-did-mount #(sfu-paint values position)
-     :component-did-update #(let [[_ vals] (reagent/argv %)] (sfu-paint vals position))}))
+     :component-did-mount #(sfu-paint values position index)
+     :component-did-update #(let [[_ vals] (reagent/argv %)] (sfu-paint vals position index))}))
 
 (defn main-panel []
-  (let [sfu-values (re-frame/subscribe [:sfu-values])]
+  (let [list (re-frame/subscribe [:creature-list])]
     (fn []
       [:div
         [:h3 "Superformula-U Test"]
-        [sfu-comp @sfu-values [100 100]]
+        (for [[i c] (partition 2 (interleave (range) @list))]
+          ^{:key i} [sfu-comp c (:pos c) i])
         [slider-panel]])))

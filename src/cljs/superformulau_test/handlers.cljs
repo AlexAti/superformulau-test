@@ -9,5 +9,10 @@
 
 (re-frame/register-handler
  :set-sfu-key
- (fn [app [_ k v]]
-   (assoc-in app [:sfu-values k] v)))
+ (fn [app [_ n k v]]
+   (assoc-in app [:creatures n k] v)))
+
+(re-frame/register-handler
+  :select-creature
+  (fn [app [_ n]]
+    (assoc-in app [:selected] n)))
