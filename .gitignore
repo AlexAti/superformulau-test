@@ -4,3 +4,6 @@
 /resources/public/js/compiled
 out
 .lein-env
+.idea
+.lein-repl-history
+superformulau-test.iml
