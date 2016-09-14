@@ -73,15 +73,17 @@
 (defn sfu-paint [values [x y] index]
   (let [hue (:hue values)
         valuevec (map values [:a :b :y :z :n1 :n2 :n3]) ; to ensure proper param order
-        d3values (clj->js [(sfu-figure 30 [x y] 128 valuevec)])]
+        d3values (clj->js [(sfu-figure 30 [x y] 128 valuevec)])
+        base-selection (.. js/d3
+                           (selectAll "svg.sfu")
+                           (filter (fn [d i] (= i index)))
+                           (selectAll "g")
+                           (data d3values))]
     ; Enter method
-    (.. js/d3
-        (selectAll "svg.sfu")
-        (filter (fn [d i] (= i index)))
-        (selectAll "g")
-        (data d3values)
+    (.. base-selection
         enter
         (append "svg:g")
+        (on "click" #(re-frame/dispatch [:select-creature index]))
         (attr "transform" (str "translate(" x "," y ")"))
         (append "svg:path")
         (attr "d" (.radialLine js/d3))
@@ -89,22 +91,14 @@
         (style "fill" (str "hsla(" (mod (+ hue 40) 360) ", 100%, 50%, 1.0)")))
 
     ; Update method
-    (.. js/d3
-        (selectAll "svg.sfu")
-        (filter (fn [d i] (= i index)))
-        (selectAll "g")
-        (data d3values)
+    (.. base-selection
         (select "path")
         (attr "d" (.radialLine js/d3))
         (style "stroke" (str "hsla(" hue ", 100%, 50%, 0.5)"))
         (style "fill" (str "hsla(" (mod (+ hue 40) 360) ", 100%, 50%, 1.0)")))
 
     ; Exit method
-    (.. js/d3
-        (selectAll "svg.sfu")
-        (filter (fn [d i] (= i index)))
-        (selectAll "g")
-        (data d3values)
+    (.. base-selection
         exit
         (remove))))
 
