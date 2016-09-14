@@ -24,6 +24,8 @@
     (fn []
       [:div.slider-panel
        [:p (str "You have selected creature #" @selected-creature)]
+       [:a {:on-click #(re-frame/dispatch [:unselect-creature])}
+           "Click to close panel"]
        (into [:form]
              (for [k (keys (first @creatures))]
                [slider
@@ -110,10 +112,12 @@
      :component-did-update #(let [[_ vals] (reagent/argv %)] (sfu-paint vals position index))}))
 
 (defn main-panel []
-  (let [list (re-frame/subscribe [:creature-list])]
+  (let [list (re-frame/subscribe [:creature-list])
+        show-panel (re-frame/subscribe [:show-panel])]
     (fn []
       [:div
         [:h3 "Superformula-U Test"]
+        (when @show-panel
+          [slider-panel])
         (for [[i c] (partition 2 (interleave (range) @list))]
-          ^{:key i} [sfu-comp c (:pos c) i])
-        [slider-panel]])))
+          ^{:key i} [sfu-comp c (:pos c) i])])))

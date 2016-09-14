@@ -15,4 +15,11 @@
 (re-frame/register-handler
   :select-creature
   (fn [app [_ n]]
-    (assoc-in app [:selected] n)))
+    (-> app
+        (assoc :highlighted true)
+        (assoc :selected n))))
+
+(re-frame/register-handler
+  :unselect-creature
+  (fn [app [_]]
+    (assoc app :highlighted false)))

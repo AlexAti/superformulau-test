@@ -11,3 +11,8 @@
   :creature-change
   (fn [db]
     (reaction (:selected @db))))
+
+(re-frame/register-sub
+  :show-panel
+  (fn [db]
+    (reaction (:highlighted @db))))

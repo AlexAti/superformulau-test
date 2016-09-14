@@ -2,8 +2,9 @@
 
 (def default-db
   {:selected 0
+   :highlighted false
    :creatures (vec
-               (for [i (range 10)]
+               (for [i (range 1000)]
                 {:a  (- (rand 10) 5)
                  :b  (- (rand 10) 5)
                  :y  (- (rand 10) 5)

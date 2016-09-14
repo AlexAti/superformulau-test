@@ -11,11 +11,12 @@ h3 {
 }
 
 div.slider-panel {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.4);
   margin: 20px;
   padding: 5px;
   position: absolute;
   float: right;
+  z-index: 100;
 }
 
 div.slider-panel .slider {
