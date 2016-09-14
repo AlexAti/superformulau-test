@@ -34,11 +34,10 @@ open https://alexati.github.io/superformulau-test/
   - add a copy svg / download svg option
 - Creature
   - see if line jump is an error and then fix
+  - Is there a glitch that makes huge stars?
   - enhance color palette
   - Center sliders around interesting values
 - Creature pool
-  - Make all gs inside the same svg
-  - Make svg as big as the visible screen
   - Fix the area function, as a radio average does not work
   - Make size wobble a little as if there was movement in z index
   - Add brownian movement

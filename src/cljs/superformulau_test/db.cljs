@@ -12,5 +12,5 @@
                  :n1 (- (rand 10) 5)
                  :n2 (- (rand 10) 5)
                  :n3 (- (rand 10) 5)
-                 :pos [100 100]
+                 :pos [(rand 2000) (rand 2000)]
                  :hue (rand-int 360)}))})

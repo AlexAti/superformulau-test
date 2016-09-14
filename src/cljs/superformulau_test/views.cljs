@@ -75,11 +75,12 @@
 (defn sfu-paint [values [x y] index]
   (let [hue (:hue values)
         valuevec (map values [:a :b :y :z :n1 :n2 :n3]) ; to ensure proper param order
-        d3values (clj->js [(sfu-figure 30 [x y] 128 valuevec)])
+        d3values (clj->js [(sfu-figure 15 [x y] 128 valuevec)])
         base-selection (.. js/d3
                            (selectAll "svg.sfu")
-                           (filter (fn [d i] (= i index)))
                            (selectAll "g")
+                           (filter (fn [d i] (= i index)))
+                           (select "g")
                            (data d3values))]
     ; Enter method
     (.. base-selection
@@ -107,7 +108,7 @@
 (defn sfu-comp [values position index]
   (reagent/create-class
     {:display-name "SuperformulaU component"
-     :reagent-render (fn [] [:svg.sfu])
+     :reagent-render (fn [] [:g])
      :component-did-mount #(sfu-paint values position index)
      :component-did-update #(let [[_ vals] (reagent/argv %)] (sfu-paint vals position index))}))
 
@@ -119,5 +120,6 @@
         [:h3 "Superformula-U Test"]
         (when @show-panel
           [slider-panel])
-        (for [[i c] (partition 2 (interleave (range) @list))]
-          ^{:key i} [sfu-comp c (:pos c) i])])))
+        [:svg.sfu
+         (for [[i c] (partition 2 (interleave (range) @list))]
+           ^{:key i} [sfu-comp c (:pos c) i])]])))
