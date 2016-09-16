@@ -30,7 +30,8 @@ open https://alexati.github.io/superformulau-test/
 - Slider panel
   - Make sliders logarithmic
   - Add a big viewer for the selected one on the panel
-  - Sort sliders so they dont jump
+  - Sort sliders and separate pos and hue from params
+  - Fix sliders so they dont jump
   - add a copy svg / download svg option
 - Creature
   - see if line jump is an error and then fix
@@ -39,7 +40,7 @@ open https://alexati.github.io/superformulau-test/
   - Center sliders around interesting values
 - Creature pool
   - Fix the area function, as a radio average does not work
-  - Make size wobble a little as if there was movement in z index
+  - Make size wobble a little as if there was movement in z index - make alpha move at the same time
   - Add brownian movement
   - Stop brownian movement on mouseover
   - Add small points that move for aesthetics

@@ -35,9 +35,3 @@ svg.sfu {
 svg.sfu rect {
   fill: none;
 }
-
-svg.sfu path {
-  stroke: hsla(0, 100%, 50%, 0.5);
-  stroke-width: 5px;
-  fill: hsla(40, 100%, 50%, 1);
-}
