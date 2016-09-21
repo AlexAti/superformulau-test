@@ -1,7 +1,7 @@
 (defproject superformulau-test "0.1.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.8.51"]
-                 [reagent "0.5.1"]
+                 [reagent "0.6.0"]
                  [binaryage/devtools "0.6.1"]
                  [re-frame "0.7.0"]
                  [cljsjs/d3 "4.2.0-0"]]

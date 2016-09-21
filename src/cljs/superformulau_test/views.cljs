@@ -98,7 +98,7 @@
                            (filter (fn [d i] (= i index)))
                            (select "g")
                            (data d3values))
-        opacity (min 1 (* 0.4 (z-pos-correction z)))
+        opacity (min 1 (* 0.25 (z-pos-correction z)))
         corrected-stroke-width (int (* 4 (z-pos-correction z)))
         blur-level (int (- 10 (* 5 (z-pos-correction z))))]
 
@@ -142,7 +142,7 @@
     (for [i (range 1 11)]
       ^{:key (str "filter" i)}
       [:filter {:id (str "blurFilter" i)}
-       [:feGaussianBlur {:in "SourceGraphic" :stdDeviation i}]])))
+       [:feGaussianBlur {:in "SourceGraphic" :stdDeviation (/ i 5)}]])))
 
 (defn main-panel []
   (let [list (re-frame/subscribe [:creature-list])
