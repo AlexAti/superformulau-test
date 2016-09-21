@@ -13,6 +13,6 @@
     (reaction (:selected @db))))
 
 (re-frame/register-sub
-  :show-panel
+  :status
   (fn [db]
-    (reaction (:highlighted @db))))
+    (reaction (:status @db))))

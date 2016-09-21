@@ -18,14 +18,19 @@
             :step (/ (- max min) 1000)
             :max max}]])
 
+(defn closing-button []
+  [:a.closing-button {:on-click #(re-frame/dispatch [:goto-status :general])}
+   "✖"])
+
 (defn slider-panel []
   (let [creatures (re-frame/subscribe [:creature-list])
         selected-creature (re-frame/subscribe [:creature-change])]
     (fn []
-      [:div.slider-panel
+      [:div.panel
+       [closing-button]
        [:p (str "You have selected creature #" @selected-creature)]
-       [:a {:on-click #(re-frame/dispatch [:unselect-creature])}
-           "Click to close panel"]
+       [:a {:on-click #(re-frame/dispatch [:goto-status :explanation])}
+           "More info on the superformula-u..."]
        (into [:form]
              (for [k (keys (first @creatures))]
                [slider
@@ -33,6 +38,38 @@
                 @selected-creature
                 [-10 10]
                 (k (nth @creatures @selected-creature))]))])))
+
+(defn explanation-panel []
+  [:div.panel
+   [closing-button]
+   [:h2 "A brief explanation of the Superformula-U"]
+   [:p [:a {:href "https://en.wikipedia.org/wiki/Superformula"} "According to Wikipedia,"]
+       " around 2000, Johan Gielis published (and patented) the following formula:"]
+   [:p "$$r(\\varphi) = \\left (\\left |\\frac{cos(\\frac{m_1\\varphi}{4})}{a}\\right |^{n_2} + \\left |\\frac{sin(\\frac{m_2\\varphi}{4})}{b}\\right |^{n_3}\\right )^{-\\frac{1}{n_1}}$$"]
+   [:p "In April 7, 2004, Uwe Stöhr published "
+        [:a {:href "http://fkurth.de/uwest/usti/Superformel/SuperformulaU.pdf"} "a generalization of the Superformula"]
+        ", which he titled SuperformulaU:"]
+   [:p "$$r(\\varphi) = \\left (\\left |\\frac{cos(\\frac{y\\varphi}{4})}{a}\\right |^{n_2} + \\left |\\frac{sin(\\frac{z\\varphi}{4})}{b}\\right |^{n_3}\\right )^{-\\frac{1}{n_1}} $$"]
+   [:p "From what I understand, the latter one does not hold a patent, and, being just a mathematical formula, we can all play with it. "
+       "(But who knows for sure, these days legality is a weird area.)"]
+   [:p "This page implements the latter one thousands of times, so you can get a feeling of the variety of patterns that these family of formulas can generate. "
+       "Clicking on any 'creature', you can navigate and fine-tune the parameters that create that specific instance, and save them for your use in any other "
+       "applications, such as for example games, art, or UX design."]
+   [:p "I hope you like it! Please do tell me if you find it interesting."]])
+
+(defn about-panel []
+  [:div.panel
+   [closing-button]
+   [:h2 "About this site"]
+   [:p "Initially this was a quick test of how to use D3 inside a clojurescript re-frame application. "
+       "I found the wikipedia page for the superformula and it seemed a fun way to test it. "
+       "But over a couple of days, the organic look of the superformula gave way to this idea, and "
+       "as it seemed a fun experiment, I evolved it a little bit more."]
+   [:p "So now the superformula is alive, and you can use this sort of petri dish to explore interesting "
+       "parameters for the applications (games, graphics, etc.) that you may want to build."]
+   [:p "You can also explore the source code and fork it as you please. In that case, please ping me "
+       "so I can know that you found this experiment interesting! I can also link to your creations if "
+       "you like."]])
 
 (defn superformulau-radium [angle [a b y z n1 n2 n3]]
   (Math.pow
@@ -146,12 +183,25 @@
 
 (defn main-panel []
   (let [list (re-frame/subscribe [:creature-list])
-        show-panel (re-frame/subscribe [:show-panel])]
+        status (re-frame/subscribe [:status])]
     (fn []
       [:div
-        [:h3 "Superformula-U Test"]
-        (when @show-panel
-          [slider-panel])
+        [:div.header
+         [:div.column
+          [:h1 "Superformula-U Test"]
+          [:p "You can click on a random creature, if you like to."]]
+         [:div.column
+          [:p
+           [:a {:on-click #(re-frame/dispatch [:toggle-status :explanation])}
+            "But what's all this?"]]
+          [:p
+           [:a {:on-click #(re-frame/dispatch [:toggle-status :about])}
+            "About this!"]]]]
+        (case @status
+           :highlighted [slider-panel]
+           :explanation [explanation-panel]
+           :about       [about-panel]
+           nil)
         [:svg.sfu
          [svg-defs-section]
          (for [[i c] (partition 2 (interleave (range) @list))]

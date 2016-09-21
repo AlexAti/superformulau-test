@@ -2,7 +2,7 @@
 
 (def default-db
   {:selected 0
-   :highlighted false
+   :status :general ; or :highlighted or :about or :explanation
    :creatures (sort-by :pos
                        (vec
                         (for [i (range 1000)]

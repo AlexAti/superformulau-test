@@ -16,10 +16,17 @@
   :select-creature
   (fn [app [_ n]]
     (-> app
-        (assoc :highlighted true)
+        (assoc :status :highlighted)
         (assoc :selected n))))
 
 (re-frame/register-handler
-  :unselect-creature
-  (fn [app [_]]
-    (assoc app :highlighted false)))
+  :goto-status
+  (fn [app [_ status]]
+    (assoc app :status status)))
+
+(re-frame/register-handler
+  :toggle-status
+  (fn [app [_ status]]
+    (if (= status (:status app))
+        (assoc app :status :general)
+        (assoc app :status status))))
