@@ -29,22 +29,24 @@ open https://alexati.github.io/superformulau-test/
 ## TO DOs
 - Slider panel
   - Make sliders logarithmic
-  - Add a big viewer for the selected one on the panel
-  - Sort sliders and separate pos and hue from params
-  - Fix sliders so they dont jump
-  - add a copy svg / download svg option
+  - Center sliders around interesting values
+  - add a "copy svg / download svg" option
 - Creature
   - see if line jump is an error and then fix
+    - It seems that the path might need to make more than one turn to complete the figure
+    - For this, y and z should be split in rational numerator and denominator - see pdf
   - Is there a glitch that makes huge stars?
-  - enhance color palette
-  - Center sliders around interesting values
+  - Some creatures are not painted as they are NaNed by D3?
+  - Enhance color palette - also research why different browsers show different saturations
 - Creature pool
   - Fix the area function, as a radio average does not work
   - Make size wobble a little as if there was movement in z index - make alpha move at the same time
   - Add brownian movement
   - Stop brownian movement on mouseover
-  - Add small points that move for aesthetics
+  - Add small points that move for "Petri dish" aesthetics
+  - Make farther away creatures tend to the center (in perspective)
 - Other
+  - Enhance performance
   - Display a brief of the formula
   - Maybe: change project name? add more creature formulas?
   - Update readme

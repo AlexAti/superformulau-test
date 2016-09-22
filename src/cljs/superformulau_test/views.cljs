@@ -1,12 +1,11 @@
 (ns superformulau-test.views
     (:require [re-frame.core :as re-frame]
               [reagent.core :as reagent]
-              [cljsjs.d3]))
+              [cljsjs.d3]
+              [superformulau-test.db :as db]))
 
 (defn slider [name creature [min max] val]
   [:div
-   [:label {:for name}
-    (str "Value for " name " is (" val "):")]
    [:input {:type "range"
             :name name
             :on-change #(re-frame/dispatch [:set-sfu-key
@@ -16,28 +15,40 @@
             :min min
             :value val
             :step (/ (- max min) 1000)
-            :max max}]])
+            :max max}]
+   [:label {:for name}
+    (str name " = " val)]])
 
 (defn closing-button []
   [:a.closing-button {:on-click #(re-frame/dispatch [:goto-status :general])}
    "✖"])
 
+(declare highlighted-comp)
 (defn slider-panel []
   (let [creatures (re-frame/subscribe [:creature-list])
         selected-creature (re-frame/subscribe [:creature-change])]
     (fn []
       [:div.panel
        [closing-button]
-       [:p (str "You have selected creature #" @selected-creature)]
-       [:a {:on-click #(re-frame/dispatch [:goto-status :explanation])}
-           "More info on the superformula-u..."]
-       (into [:form]
-             (for [k (keys (first @creatures))]
-               [slider
-                (subs (str k) 1)
-                @selected-creature
-                [-10 10]
-                (k (nth @creatures @selected-creature))]))])))
+       [:h2 (str "You have selected creature #" @selected-creature)]
+       (let [creature (nth @creatures @selected-creature)
+             template (apply concat
+                             (map #(vector % (% db/ranges))
+                                  [:a :b :y :z :n1 :n2 :n3]))]
+         [:div.columnated
+          [:div
+           (into [:form]
+                 (for [k (take-nth 2 template)]
+                   [slider
+                    (subs (str k) 1)
+                    @selected-creature
+                    (k (apply array-map template))
+                    (k creature)]))
+           [:a {:on-click #(re-frame/dispatch [:goto-status :explanation])}
+            "More info on the superformula-u..."]]
+          [:div
+           [:svg.highlighted
+            [highlighted-comp creature @selected-creature]]]])])))
 
 (defn explanation-panel []
   [:div.panel
@@ -45,7 +56,7 @@
    [:h2 "A brief explanation of the Superformula-U"]
    [:p [:a {:href "https://en.wikipedia.org/wiki/Superformula"} "According to Wikipedia,"]
        " around 2000, Johan Gielis published (and patented) the following formula:"]
-   [:p "$$r(\\varphi) = \\left (\\left |\\frac{cos(\\frac{m_1\\varphi}{4})}{a}\\right |^{n_2} + \\left |\\frac{sin(\\frac{m_2\\varphi}{4})}{b}\\right |^{n_3}\\right )^{-\\frac{1}{n_1}}$$"]
+   [:p "$$r(\\varphi) = \\left (\\left |\\frac{cos(\\frac{m\\varphi}{4})}{a}\\right |^{n_2} + \\left |\\frac{sin(\\frac{m\\varphi}{4})}{b}\\right |^{n_3}\\right )^{-\\frac{1}{n_1}}$$"]
    [:p "In April 7, 2004, Uwe Stöhr published "
         [:a {:href "http://fkurth.de/uwest/usti/Superformel/SuperformulaU.pdf"} "a generalization of the Superformula"]
         ", which he titled SuperformulaU:"]
@@ -84,8 +95,8 @@
 
 (defn z-pos-correction [z]
   "0-based percentage correction factor for objects far or near.
-   A z value in [-2000 2000] gets a [0.5 2.0] correction."
-  (let [sizescale [-2000 2000] ; 0-centered z position reference coord-scale as source
+   A z value in the db/ranges :posz range gets a [0.5 2.0] correction."
+  (let [sizescale (:posz db/ranges) ; 0-centered z position reference coord-scale as source
         targetscale [0.5 2.0] ; 1-centered target %-scale.
         factor (* 0.5 (apply + ; To fix: This average is a hack, doesn't really work with [0.5 2.0] as it is not centered on 1 as [0.8 1.2]
                         (map #(apply / %)
@@ -125,16 +136,22 @@
     ;; (see https://github.com/d3/d3-shape#lines)
      polarcoords)))
 
-(defn sfu-paint [values [x y z] index]
+(defn sfu-paint [size values [x y z] index is-highlighted?]
   (let [hue (:hue values)
         valuevec (map values [:a :b :y :z :n1 :n2 :n3]) ; to ensure proper param order
-        d3values (clj->js [(sfu-figure 15 [x y z] 128 valuevec)])
-        base-selection (.. js/d3
-                           (selectAll "svg.sfu")
-                           (selectAll "g")
-                           (filter (fn [d i] (= i index)))
-                           (select "g")
-                           (data d3values))
+        d3values (clj->js [(sfu-figure size [x y z] 128 valuevec)])
+        base-selection (if is-highlighted?
+                           (.. js/d3
+                               (selectAll "svg.highlighted")
+                               (selectAll "g")
+                               (select "g")
+                               (data d3values))
+                           (.. js/d3
+                               (selectAll "svg.sfu")
+                               (selectAll "g")
+                               (filter (fn [d i] (= i index)))
+                               (select "g")
+                               (data d3values)))
         opacity (min 1 (* 0.25 (z-pos-correction z)))
         corrected-stroke-width (int (* 4 (z-pos-correction z)))
         blur-level (int (- 10 (* 5 (z-pos-correction z))))]
@@ -168,10 +185,17 @@
 
 (defn sfu-comp [values position index]
   (reagent/create-class
-    {:display-name "SuperformulaU component"
+    {:display-name "SuperformulaU creature pool"
      :reagent-render (fn [] [:g])
-     :component-did-mount #(sfu-paint values position index)
-     :component-did-update #(let [[_ vals] (reagent/argv %)] (sfu-paint vals position index))}))
+     :component-did-mount #(sfu-paint 15 values position index false)
+     :component-did-update #(let [[_ vals] (reagent/argv %)] (sfu-paint 15 vals position index false))}))
+
+(defn highlighted-comp [values index]
+  (reagent/create-class
+    {:display-name "SuperformulaU highlighted creature"
+     :reagent-render (fn [] [:g])
+     :component-did-mount #(sfu-paint 200 values [0 0 0] index true)
+     :component-did-update #(let [[_ vals] (reagent/argv %)] (sfu-paint 50 vals [100 100 0] index true))}))
 
 (defn svg-defs-section []
   (into
@@ -181,7 +205,7 @@
       [:filter {:id (str "blurFilter" i)}
        [:feGaussianBlur {:in "SourceGraphic" :stdDeviation (/ i 5)}]])))
 
-(defn main-panel []
+(defn app []
   (let [list (re-frame/subscribe [:creature-list])
         status (re-frame/subscribe [:status])]
     (fn []
