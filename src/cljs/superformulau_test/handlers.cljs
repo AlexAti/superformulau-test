@@ -30,3 +30,9 @@
     (if (= status (:status app))
         (assoc app :status :general)
         (assoc app :status status))))
+
+(re-frame/register-handler
+  :rerender-mathjax
+  (fn [app [_]]
+    (.Typeset js/MathJax.Hub)
+    app))

@@ -199,7 +199,8 @@
             "About this!"]]]]
         (case @status
            :highlighted [slider-panel]
-           :explanation [explanation-panel]
+           :explanation (do (re-frame/dispatch [:rerender-mathjax])
+                            [explanation-panel])
            :about       [about-panel]
            nil)
         [:svg.sfu
