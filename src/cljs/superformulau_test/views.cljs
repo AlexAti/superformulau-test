@@ -193,10 +193,13 @@
          [:div.column
           [:p
            [:a {:on-click #(re-frame/dispatch [:toggle-status :explanation])}
-            "But what's all this?"]]
+            "About the SuperformulaU"]]
           [:p
            [:a {:on-click #(re-frame/dispatch [:toggle-status :about])}
-            "About this!"]]]]
+            "About this site"]]
+          [:p
+           [:a {:href "https://github.com/AlexAti/superformulau-test"}
+            "Check the Github repo"]]]]
         (case @status
            :highlighted [slider-panel]
            :explanation (do (re-frame/dispatch [:rerender-mathjax])

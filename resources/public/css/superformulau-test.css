@@ -11,9 +11,11 @@ a {
 
 a.closing-button {
   text-decoration: none;
-  font-size: 300%;
+  font-size: 200%;
   position: relative;
+  float:right;
   color: rgba(25, 25, 25, 0.4);
+  margin: -0.5em; /* to offset against panel 2em padding */
 }
 
 div.header {
