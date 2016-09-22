@@ -1,0 +1,2 @@
+;; Analyzed by ClojureScript 1.8.51
+{:use-macros {reaction reagent.ratom}, :excludes #{}, :name superformulau-test.subs, :imports nil, :requires {re-frame re-frame.core, re-frame.core re-frame.core}, :uses nil, :require-macros {reagent.ratom reagent.ratom}, :cljs.analyzer/constants {:seen #{:selected :creature-list :creature-change :status :creatures}, :order [:creature-list :creatures :creature-change :selected :status]}, :doc nil}

@@ -1,26 +1,57 @@
 body {
   background-color: rgb(90, 90, 90);
   font-family: sans-serif;
-}
-
-div#app {
-}
-
-h3 {
   color: rgb(230, 230, 230);
+  margin: 0;
 }
 
-div.slider-panel {
-  background-color: rgba(255, 255, 255, 0.4);
-  margin: 20px;
-  padding: 5px;
-  position: absolute;
-  float: right;
+a {
+  text-decoration: underline;
+}
+
+a.closing-button {
+  text-decoration: none;
+  font-size: 200%;
+  position: relative;
+  float:right;
+  color: rgba(25, 25, 25, 0.4);
+  margin: -0.5em; /* to offset against panel 2em padding */
+}
+
+div.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+div.column {
+  margin: 0px 10px;
+}
+
+div.panel {
+  background-color: rgba(200, 200, 200, 0.6);
+  margin: 10%;
+  padding: 2em;
+  border-radius: 2em;
+
   z-index: 100;
+
+  color: rgb(25, 25, 25);
 }
 
-div.slider-panel .slider {
+div.columnated {
+  display: flex;
+  flex-direction: row;
+}
+
+div.panel .slider {
   margin: 5px;
+}
+
+svg.highlighted {
+  width: 100%;
+  height: 100%;
 }
 
 svg.sfu {
