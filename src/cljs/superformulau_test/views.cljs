@@ -31,6 +31,7 @@
       [:div.panel
        [closing-button]
        [:h2 (str "You have selected creature #" @selected-creature)]
+       [:p "You can fine-tune the parameters that generate it here."]
        (let [creature (nth @creatures @selected-creature)
              template (apply concat
                              (map #(vector % (% db/ranges))
@@ -44,8 +45,11 @@
                     @selected-creature
                     (k (apply array-map template))
                     (k creature)]))
-           [:a {:on-click #(re-frame/dispatch [:goto-status :explanation])}
-            "More info on the superformula-u..."]]
+           [:p "If you are not sure about what these parameters are, please check the "
+            [:a {:on-click #(re-frame/dispatch [:goto-status :explanation])}
+             "info on the superformula-u"]
+            " or just play with them to see the changes."]
+           [:p "Once you are happy with it, click here [TODO] to download the resulting SVG!"]]
           [:div
            [:svg.highlighted
             [highlighted-comp creature @selected-creature]]]])])))
@@ -63,7 +67,7 @@
    [:p "$$r(\\varphi) = \\left (\\left |\\frac{cos(\\frac{y\\varphi}{4})}{a}\\right |^{n_2} + \\left |\\frac{sin(\\frac{z\\varphi}{4})}{b}\\right |^{n_3}\\right )^{-\\frac{1}{n_1}} $$"]
    [:p "From what I understand, the latter one does not hold a patent, and, being just a mathematical formula, we can all play with it. "
        "(But who knows for sure, these days legality is a weird area.)"]
-   [:p "This page implements the latter one thousands of times, so you can get a feeling of the variety of patterns that these family of formulas can generate. "
+   [:p "This page implements the latter one hundreds of times, so you can get a feeling of the variety of patterns that these family of formulas can generate. "
        "Clicking on any 'creature', you can navigate and fine-tune the parameters that create that specific instance, and save them for your use in any other "
        "applications, such as for example games, art, or UX design."]
    [:p "I hope you like it! Please do tell me if you find it interesting."]])
@@ -78,9 +82,9 @@
        "as it seemed a fun experiment, I evolved it a little bit more."]
    [:p "So now the superformula is alive, and you can use this sort of petri dish to explore interesting "
        "parameters for the applications (games, graphics, etc.) that you may want to build."]
-   [:p "You can also explore the source code and fork it as you please. In that case, please ping me "
-       "so I can know that you found this experiment interesting! I can also link to your creations if "
-       "you like."]])
+   [:p "You can also explore the source code in the github repo (linked in the upper right corner), and "
+       "fork it as you please. In that case, please ping me so I can know that you found this experiment "
+       "useful! I can also point a link to what you did with it, if you like me to."]])
 
 (defn superformulau-radium [angle [a b y z n1 n2 n3]]
   (Math.pow
